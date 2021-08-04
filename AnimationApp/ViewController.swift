@@ -1,9 +1,4 @@
-//
-//  ViewController.swift
-//  AnimationApp
-//
-//  Created by slava on 04.08.2021.
-//
+
 
 import Spring
 
@@ -34,40 +29,54 @@ enum AnimationCurve: String, CaseIterable {
 
 class ViewController: UIViewController {
 
-    @IBOutlet weak var infoLabel: UILabel!
-    @IBOutlet weak var springView: SpringView!
+    @IBOutlet private weak var infoLabel: UILabel!
+    @IBOutlet private weak var springView: SpringView!
+    @IBOutlet private weak var animationButton: UIButton!
     
-    let animations: [Animation] = [
-        .shake,
-        .slideLeft,
-        .pop,
-        .flipX,
-        .flipY,
-        .morph,
-        .squeeze,
-        .flash,
-        .wobble,
-        .swing
-    ]
+    private var animation: Animation!
+    private var curve: AnimationCurve!
     
-    @IBAction func startAnimationBtn(_ sender: UIButton) {
-        setOptions()
-        springView.animate()
-    }
+    private let animations = Animation.allCases
+    private let animationCurve = AnimationCurve.allCases
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setRandomAnimation()
+        setOptions()
+        animationButton.setTitle("Start \(animation.rawValue)", for: .normal)
     }
     
-    func setOptions() {
-        let animation = animations.randomElement()
-        
-        springView.force = 1
-        springView.delay = 0
-        springView.duration = 5
-        
-        springView.animation = animation?.rawValue ?? ""
+    @IBAction func startAnimationBtn(sender: UIButton) {
+        setOptions()
+        springView.animate()
+        setRandomAnimation()
+        sender.setTitle(animation.rawValue, for: .normal)
     }
-
+    
+    private func setRandomAnimation() {
+        animation = animations.randomElement()
+        curve = animationCurve.randomElement()
+    }
+    
+    private func setOptions() {
+        springView.force = CGFloat.random(in: 0.1...3.0)
+        springView.delay = CGFloat.random(in: 0.1...1.0)
+        springView.duration = CGFloat.random(in: 1.0...7.0)
+        springView.velocity = CGFloat.random(in: 1.0...3.0)
+        springView.animation = animation?.rawValue ?? ""
+        springView.curve = curve?.rawValue ?? ""
+        setLabel()
+    }
+    
+    private func setLabel() {
+        infoLabel.text = """
+animation: \(springView.animation)
+curve: \(springView.curve)
+force: \(Float(springView.force))
+duration: \(Float(springView.duration))
+velocity: \(Float(springView.velocity))
+delay: \(Float(springView.delay))
+"""
+    }
 }
 
